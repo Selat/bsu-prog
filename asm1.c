@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+/*
+ * The task is to calculate the following function:
+ * D(n, m) = \dfrac{(5n)!(5m)!}
+ *             {n!m!(3n + m)!(3m + n)!}
+ */
+
 int FPower(int x, int n)
 {
 	__asm__ volatile (
@@ -9,13 +15,13 @@ int FPower(int x, int n)
 		"mov eax, 1\n"
 		"mov ecx, %1\n"
 		"mov ebx, %0\n"
-		"loop1: jecxz end1\n"
+		"loop1: jecxz end_pow\n"
 		"shr ecx, 1\n"
 		"jnc skip1\n"
 		"imul eax, ebx\n"
 		"skip1: imul ebx, ebx\n"
 		"jmp loop1\n"
-		"end1:"
+		"end_pow:"
 		:
 		: "r" (x), "r" (n)
 		);
@@ -42,7 +48,8 @@ int gcd(uint64_t a, uint64_t b)
 	return a|b;
 }
 
-uint64_t test1(int n, int m)
+/* This function caculates function up to D(2, 2) */
+uint64_t calc1(int n, int m)
 {
 	float v1[] = {1.0f, 2.0f, 3.0f, 4.0f};
 	float v2[] = {2.0f, 3.0f, 4.0f, 5.0f};
@@ -184,7 +191,118 @@ uint64_t test1(int n, int m)
 		);
 }
 
-int cal1(int n, int m)
+/* This function caculates function up to D(6, 6) */
+uint64_t calc2(int n, int m)
+{
+	__asm__ volatile (
+		/*
+		 * Registers use:
+		 * rbx = a
+		 * rdi = b
+		 * rsi = D(n, m)
+		 * D(n, m) = D(n, m - 1) * a / b or D(n, 0) = D(n - 1, 0) * a / b
+		 */
+		"mov rsi, 1\n"
+
+		/* Calculate D(n, 0) */
+		"mov rcx, 1\n"
+		"d_n_0_calc: cmp ecx, %0\n"
+		"jg d_n_0_end\n"
+
+		/* Calculate nominator in rbx */
+		"mov rbx, 1\n"
+		"mov rax, rcx\n"
+		"imul rax, 5\n"
+		"mov r8, rcx\n"
+		"mov rcx, 5\n"
+		"d_n_0_nom:"
+		"imul rbx, rax\n"
+		"dec rax\n"
+		"loop d_n_0_nom\n"
+		"mov rcx, r8\n"
+
+		/* Calculate denominator in rdi */
+		"mov rdi, rcx\n"
+		"imul rdi, rcx\n"
+		"mov rax, rcx\n"
+		"imul rax, 3\n"
+		"mov r8, rcx\n"
+		"mov rcx, 3\n"
+		"d_n_0_denom: "
+		"imul rdi, rax\n"
+		"dec rax\n"
+		"loop d_n_0_denom\n"
+		"mov rcx, r8\n"
+
+		/*
+		 * Calculate D(n, 0) = D(n - 1, 0) * rbx / rdi
+		 * TODO: Divide rbx and rdi by gcd(rbx, rdi) to prevent integer overflows.
+		 */
+		"mov rax, rsi\n"
+		"imul rax, rbx\n"
+		"xor rdx, rdx\n"
+		"div rdi\n"
+		"mov rsi, rax\n"
+
+		"inc ecx\n"
+		"jmp d_n_0_calc\n"
+		"d_n_0_end: "
+
+		/* Calculate D(n, m) (now we now the value of D(n, 0) */
+		"mov rcx, 1\n"
+		"d_n_m_calc: cmp ecx, %1\n"
+		"jg d_n_m_end\n"
+
+		/* Calculate nominator in rbx */
+		"mov rbx, 1\n"
+		"mov rax, rcx\n"
+		"imul rax, 5\n"
+		"mov r8, rcx\n"
+		"mov rcx, 5\n"
+		"d_n_m_nom:"
+		"imul rbx, rax\n"
+		"dec rax\n"
+		"loop d_n_m_nom\n"
+		"mov rcx, r8\n"
+
+		/* Calculate denominator in rdi: m * (3n + m) * (3m + n) * (3m + n - 1) * (3m + n - 2)*/
+		"mov rdi, rcx\n"
+		"mov eax, %0\n"
+		"imul rax, 3\n"
+		"add rax, rcx\n"
+		"imul rdi, rax\n"
+		"mov rax, rcx\n"
+		"imul rax, 3\n"
+		"add eax, %0\n"
+		"mov r8, rcx\n"
+		"mov rcx, 3\n"
+		"d_n_m_denom: "
+		"imul rdi, rax\n"
+		"dec rax\n"
+		"loop d_n_m_denom\n"
+		"mov rcx, r8\n"
+
+		/*
+		 * Calculate D(n, m) = D(n, m - 1) * rbx / rdi
+		 * TODO: Divide rbx and rdi by gcd(rbx, rdi) to prevent integer overflows.
+		 */
+
+		"mov rax, rsi\n"
+		"imul rax, rbx\n"
+		"xor rdx, rdx\n"
+		"div rdi\n"
+		"mov rsi, rax\n"
+
+		"inc ecx\n"
+		"jmp d_n_m_calc\n"
+		"d_n_m_end: "
+		"mov rax, rsi\n"
+		:
+		: "g" (n), "g" (m)
+		);
+}
+
+int calc3(int n, int m)
 {
 	int i;
 	long long int nom = 1, denom = 1;
@@ -213,7 +331,6 @@ int main()
 {
 	int n, m;
 	scanf("%d %d", &n, &m);
-	printf("%llu\n", test1(n, m));
-	/* printf("%d\n", sum(n, m)); */
+	printf("%llu\n", calc2(n, m));
 	return 0;
 }
