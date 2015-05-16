@@ -20,6 +20,7 @@ set(SOURCES
   dbkey.cpp
   dbfile.cpp
   dbfield.cpp
+  dbrecord.cpp
   dbiterator.cpp
   )
 

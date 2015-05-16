@@ -8,6 +8,7 @@ struct DBField
 	DBField() {type = NIL;}
 	bool operator==(const DBField &f) const;
 	bool operator!=(const DBField &f) const;
+	bool operator<(const DBField &f) const;
 	union {
 		int integer;
 	} value;

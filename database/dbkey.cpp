@@ -23,4 +23,18 @@ bool DBKey::operator==(const DBKey &k) const
 
 bool DBKey::operator<(const DBKey &k) const
 {
+	if(fields_.size() < k.fields_.size()) {
+		return true;
+	} else if(fields_.size() == k.fields_.size()) {
+		for(size_t i = 0; i < fields_.size(); ++i) {
+			if(fields_[i] < k.fields_[i]) {
+				return true;
+			} else if(k.fields_[i] < fields_[i]) {
+				return false;
+			}
+		}
+		return false;
+	} else {
+		return false;
+	}
 }

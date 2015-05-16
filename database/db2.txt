@@ -1,0 +1,5 @@
+Year Group Weight
+1 1 60
+1 2 80
+2 1 40
+2 2 50
