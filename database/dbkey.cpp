@@ -2,6 +2,10 @@
 
 #include <algorithm>
 
+DBKey::DBKey()
+{
+}
+
 DBKey::DBKey(const std::vector <DBField> &fields, const std::vector <int> &ids) :
 	fields_(ids.size())
 {
@@ -37,4 +41,9 @@ bool DBKey::operator<(const DBKey &k) const
 	} else {
 		return false;
 	}
+}
+
+const std::vector <DBField>& DBKey::getFields() const
+{
+	return fields_;
 }

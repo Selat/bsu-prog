@@ -33,6 +33,11 @@ bool DBFile::open()
 	}
 }
 
+bool DBFile::eof()
+{
+	return file_.eof();
+}
+
 void DBFile::close()
 {
 	file_.close();
@@ -50,14 +55,14 @@ bool DBFile::readNextEntry()
 	}
 }
 
-const std::vector <DBField>& DBFile::getCurrentEntry()
+const DBRecord& DBFile::getCurrentEntry() const
 {
 	return entry_;
 }
 
-DBKey DBFile::getCurrentKey()
+DBKey DBFile::getCurrentKey() const
 {
-	return DBKey(entry_, key_fields_);
+	return DBKey(entry_.getFields(), key_fields_);
 }
 
 void DBFile::setFieldNames(const std::initializer_list<std::string> &names)
@@ -68,6 +73,7 @@ void DBFile::setFieldNames(const std::initializer_list<std::string> &names)
 void DBFile::setKeyFields(const std::initializer_list<int> &l)
 {
 	key_fields_.assign(l.begin(), l.end());
+	entry_.setKeyFields(key_fields_);
 }
 
 const std::vector <std::string>& DBFile::getFieldNames()

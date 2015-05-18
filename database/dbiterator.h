@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "dbfile.h"
+#include "dbrecord.h"
 
 class DBIterator
 {
@@ -16,7 +17,7 @@ public:
 private:
 	std::vector <DBFile*> files_;
 	std::vector <bool> have_entry_;
-	std::vector <DBField> enry_;
+	std::vector <DBRecord> entry_;
 };
 
 #endif
