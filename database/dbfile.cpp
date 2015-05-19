@@ -51,6 +51,7 @@ bool DBFile::readNextEntry()
 		for(size_t i = 0; i < entry_.size(); ++i) {
 			if(!(file_ >> entry_[i])) return false;
 		}
+		entry_.setKeyFields(key_fields_);
 		return true;
 	}
 }

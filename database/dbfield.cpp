@@ -39,6 +39,7 @@ bool DBField::operator<(const DBField &f) const
 
 std::istream& operator>>(std::istream &in, DBField &field)
 {
+	field.type = DBField::INTEGER;
 	in >> field.value.integer;
 	return in;
 }

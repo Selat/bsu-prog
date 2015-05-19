@@ -1,5 +1,9 @@
 #include "dbrecord.h"
 
+DBRecord::DBRecord()
+{
+}
+
 DBRecord::DBRecord(int num) :
 	fields_(num)
 {
@@ -21,6 +25,11 @@ DBField& DBRecord::operator[](int id)
 	return fields_[id];
 }
 
+const DBField& DBRecord::operator[](int id) const
+{
+	return fields_[id];
+}
+
 void DBRecord::setKeyFields(const std::vector <int> &key_fields)
 {
 	key_ = DBKey(fields_, key_fields);
@@ -31,12 +40,27 @@ size_t DBRecord::size() const
 	return fields_.size();
 }
 
+void DBRecord::clear()
+{
+	fields_.clear();
+}
+
+void DBRecord::resize(size_t size)
+{
+	fields_.resize(size);
+}
+
 const DBKey& DBRecord::getKey() const
 {
 	return key_;
 }
 
 const std::vector<DBField>& DBRecord::getFields() const
+{
+	return fields_;
+}
+
+std::vector<DBField>& DBRecord::getFields()
 {
 	return fields_;
 }

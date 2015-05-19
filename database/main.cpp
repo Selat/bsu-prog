@@ -15,8 +15,12 @@ int main()
 	file2.setKeyFields({0, 1});
 	file3.setKeyFields({0, 1, 2});
 	DBIterator it(files);
+	it.init();
 	while(it.nextEntry()) {
-		cout << it.getCurrentEntry()[2] << endl;
+		for(int i = 0; i < it.getCurrentEntry().size(); ++i) {
+			cout << it.getCurrentEntry()[i] << " ";
+		}
+		cout << endl;
 	}
 	return 0;
 }

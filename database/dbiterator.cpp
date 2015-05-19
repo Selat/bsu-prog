@@ -15,6 +15,7 @@ void DBIterator::init()
 	for(auto f : files_) {
 		f->open();
 		have_entry_.assign(files_.size(), false);
+		entry_.resize(files_.size());
 	}
 }
 
@@ -35,7 +36,9 @@ bool DBIterator::nextEntry()
 	bool found_min = false;
 	DBKey min_key;
 	for(size_t i = 0; i < files_.size(); ++i) {
-		if(have_entry_[i] && (!found_min || (entry_[i].getKey() < min_key))) {
+		if(have_entry_[i] && (!found_min || (entry_[i].getKey() < min_key)
+		                      || ((entry_[i].getKey() == min_key)
+		                          && (entry_[i].getKey().getFields().size() > min_key.getFields().size())))) {
 			min_key = entry_[i].getKey();
 			found_min = true;
 		}
@@ -47,7 +50,7 @@ bool DBIterator::nextEntry()
 	// Calculate required size of the key
 	size_t key_size = 0;
 	for(size_t i = 0; i < files_.size(); ++i) {
-		if(have_entry_[i] && (entry_[i].getKey().getFields().size() > key_size)) {
+		if(have_entry_[i] && (entry_[i].getKey() == min_key) && (entry_[i].getKey().getFields().size() > key_size)) {
 			key_size = entry_[i].getKey().getFields().size();
 		}
 	}
@@ -60,8 +63,29 @@ bool DBIterator::nextEntry()
 			fields_size += curnum;
 		}
 	}
+	cur_entry_.clear();
+	cur_entry_.resize(key_size + fields_size);
+
+	// Fill key of the record
+	for(size_t i = 0; i < key_size; ++i) {
+		cur_entry_.getFields()[i] = min_key.getFields()[i];
+	}
+	// Combine all available fields from the files
+	int cur_field_id = key_size;
+	for(size_t i = 0; i < files_.size(); ++i) {
+		if(have_entry_[i] && (entry_[i].getKey() == min_key)) {
+			for(size_t j = entry_[i].getKey().getFields().size(); j < entry_[i].getFields().size(); ++j) {
+				cur_entry_.getFields()[cur_field_id++] = entry_[i].getFields()[j];
+			}
+			// Move iterator in each file forward
+			files_[i]->readNextEntry();
+			have_entry_[i] = false;
+		}
+	}
+	return true;
 }
 
-const std::vector <DBField>& DBIterator::getCurrentEntry()
+const DBRecord& DBIterator::getCurrentEntry()
 {
+	return cur_entry_;
 }

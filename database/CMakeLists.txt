@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-project(asm-matrix)
+project(database)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
