@@ -18,6 +18,7 @@ private:
 	std::vector <DBFile*> files_;
 	std::vector <bool> have_entry_;
 	std::vector <DBRecord> entry_;
+	std::vector <bool> used_;
 	DBRecord cur_entry_;
 };
 

@@ -16,6 +16,7 @@ void DBIterator::init()
 		f->open();
 		have_entry_.assign(files_.size(), false);
 		entry_.resize(files_.size());
+		used_.assign(files_.size(), false);
 	}
 }
 
@@ -35,16 +36,38 @@ bool DBIterator::nextEntry()
 	// Firstly we find the minimum key of all available
 	bool found_min = false;
 	DBKey min_key;
+	int min_key_id = 0;
 	for(size_t i = 0; i < files_.size(); ++i) {
 		if(have_entry_[i] && (!found_min || (entry_[i].getKey() < min_key)
 		                      || ((entry_[i].getKey() == min_key)
 		                          && (entry_[i].getKey().getFields().size() > min_key.getFields().size())))) {
 			min_key = entry_[i].getKey();
+			min_key_id = i;
 			found_min = true;
 		}
 	}
 	if(!found_min) {
 		return false;
+	}
+
+	// Looks like we are going to reuse old record, so we have to move iterators forward in all files
+	while(used_[min_key_id]) {
+		have_entry_[min_key_id] = files_[min_key_id]->readNextEntry();
+		entry_[min_key_id] = files_[min_key_id]->getCurrentEntry();
+		used_[min_key_id] = false;
+		found_min = false;
+		for(size_t i = 0; i < files_.size(); ++i) {
+			if(have_entry_[i] && (!found_min || (entry_[i].getKey() < min_key)
+			                      || ((entry_[i].getKey() == min_key)
+			                          && (entry_[i].getKey().getFields().size() > min_key.getFields().size())))) {
+				min_key = entry_[i].getKey();
+				min_key_id = i;
+				found_min = true;
+			}
+		}
+		if(!found_min) {
+			return false;
+		}
 	}
 
 	// Calculate required size of the key
@@ -77,11 +100,33 @@ bool DBIterator::nextEntry()
 			for(size_t j = entry_[i].getKey().getFields().size(); j < entry_[i].getFields().size(); ++j) {
 				cur_entry_.getFields()[cur_field_id++] = entry_[i].getFields()[j];
 			}
-			// Move iterator in each file forward
-			files_[i]->readNextEntry();
-			have_entry_[i] = false;
 		}
 	}
+
+	// Move iterator in each file forward
+	for(size_t i = 0; i < files_.size(); ++i) {
+		if(have_entry_[i] && (entry_[i].getKey() == min_key)) {
+			if(entry_[i].getKey().getFields().size() == min_key.getFields().size()) {
+				files_[i]->readNextEntry();
+				entry_[i] = files_[i]->getCurrentEntry();
+				have_entry_[i] = true;
+			} else {
+				used_[i] = true;
+			}
+		}
+	}
+
+	// bool should_move = false;
+	// for(size_t i = 0; i < files_.size(); ++i) {
+	// 	if(have_entry_[i] && (entry_[i].getKey() == min_key)) {
+	// 		for(size_t j = entry_[i].getKey().getFields().size(); j < entry_[i].getFields().size(); ++j) {
+	// 			cur_entry_.getFields()[cur_field_id++] = entry_[i].getFields()[j];
+	// 		}
+	// 		// Move iterator in each file forward
+	// 		files_[i]->readNextEntry();
+	// 		have_entry_[i] = false;
+	// 	}
+	// }
 	return true;
 }
 
