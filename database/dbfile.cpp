@@ -33,7 +33,7 @@ bool DBFile::open()
 	}
 }
 
-bool DBFile::eof()
+bool DBFile::eof() const
 {
 	return file_.eof();
 }
@@ -77,7 +77,7 @@ void DBFile::setKeyFields(const std::initializer_list<int> &l)
 	entry_.setKeyFields(key_fields_);
 }
 
-const std::vector <std::string>& DBFile::getFieldNames()
+const std::vector <std::string>& DBFile::getFieldNames() const
 {
 	return field_names_;
 }

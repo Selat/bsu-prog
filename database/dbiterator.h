@@ -13,7 +13,7 @@ public:
 	DBIterator(const std::vector<DBFile*> &files);
 	void init();
 	bool nextEntry();
-	const DBRecord& getCurrentEntry();
+	const DBRecord& getCurrentEntry() const;
 private:
 	std::vector <DBFile*> files_;
 	std::vector <bool> have_entry_;

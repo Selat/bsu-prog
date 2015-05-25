@@ -16,7 +16,7 @@ public:
 	DBFile(const std::string &filename, int fields_num);
 	bool open();
 	void close();
-	bool eof();
+	bool eof() const;
 	bool readNextEntry();
 
 	const DBRecord& getCurrentEntry() const;
@@ -25,7 +25,7 @@ public:
 	void setFieldNames(const std::initializer_list<std::string> &names);
 	void setKeyFields(const std::initializer_list<int> &l);
 
-	const std::vector <std::string>& getFieldNames();
+	const std::vector <std::string>& getFieldNames() const;
 
 protected:
 	std::string filename_;

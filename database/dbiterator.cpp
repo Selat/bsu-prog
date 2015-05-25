@@ -130,7 +130,7 @@ bool DBIterator::nextEntry()
 	return true;
 }
 
-const DBRecord& DBIterator::getCurrentEntry()
+const DBRecord& DBIterator::getCurrentEntry() const
 {
 	return cur_entry_;
 }
