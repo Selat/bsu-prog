@@ -1,5 +1,7 @@
 #include "dbiterator.h"
 
+#include "dbexceptions.h"
+
 DBIterator::DBIterator(const std::initializer_list<DBFile*> &files) :
 	files_(files)
 {
@@ -70,6 +72,12 @@ bool DBIterator::nextEntry()
 		}
 	}
 
+	for(size_t i = 0; i < files_.size(); ++i) {
+		if(!(entry_[i].getKey() == min_key)) {
+			throw DBException("Unmatched keys");
+		}
+	}
+
 	// Calculate required size of the key
 	size_t key_size = 0;
 	for(size_t i = 0; i < files_.size(); ++i) {
@@ -107,26 +115,13 @@ bool DBIterator::nextEntry()
 	for(size_t i = 0; i < files_.size(); ++i) {
 		if(have_entry_[i] && (entry_[i].getKey() == min_key)) {
 			if(entry_[i].getKey().getFields().size() == min_key.getFields().size()) {
-				files_[i]->readNextEntry();
+				have_entry_[i] = files_[i]->readNextEntry();
 				entry_[i] = files_[i]->getCurrentEntry();
-				have_entry_[i] = true;
 			} else {
 				used_[i] = true;
 			}
 		}
 	}
-
-	// bool should_move = false;
-	// for(size_t i = 0; i < files_.size(); ++i) {
-	// 	if(have_entry_[i] && (entry_[i].getKey() == min_key)) {
-	// 		for(size_t j = entry_[i].getKey().getFields().size(); j < entry_[i].getFields().size(); ++j) {
-	// 			cur_entry_.getFields()[cur_field_id++] = entry_[i].getFields()[j];
-	// 		}
-	// 		// Move iterator in each file forward
-	// 		files_[i]->readNextEntry();
-	// 		have_entry_[i] = false;
-	// 	}
-	// }
 	return true;
 }
 
