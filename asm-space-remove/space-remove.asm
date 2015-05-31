@@ -31,9 +31,9 @@ loop:
 	repe scasb					; Search for the beginning of the word after some spaces
 	cmp rcx, 0
 	jne skip3
-	cmp byte [rdi - 1], 0
+	cmp byte [rdi], 0
 	jne skip3
-	cmp byte [rdi - 2], 32
+	cmp byte [rdi - 1], 32
 	je end
 skip3:
 	;; jrcxz end
