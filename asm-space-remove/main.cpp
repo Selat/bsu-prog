@@ -2,14 +2,14 @@
 #include <cstring>
 #include <cassert>
 
-#define VAL(ID) ID
-
-#define TESTCASE(ID, IN, OUT) \
-	char str ## ID [] = IN; \
-	char str ## ID ## _ans[] = OUT; \
-	solve(str ## ID); \
-	int res ## ID = strcmp(str ## ID, str ## ID ## _ans); \
-	assert(res ## ID == 0);	\
+#define TESTCASE(IN, OUT)	  \
+	do{ \
+		char str [] = IN; \
+		char str_ans[] = OUT; \
+		solve(str); \
+		int res = strcmp(str, str_ans); \
+		assert(res == 0); \
+	}while(0)
 
 using namespace std;
 
@@ -20,20 +20,27 @@ using namespace std;
  * after each ';' - it constitues for the end of the sentence.
  */
 
-extern "C" int solve(char *s);
+extern "C" void solve(char *s);
 
 void runTests()
 {
-	// TESTCASE(1, "   1    23   3    5     ", "1 23 3 5");
-	// TESTCASE(2, "      1 23   3    5", "1 23 3 5");
-	// TESTCASE(3, "1       23   3    5", "1 23 3 5");
-	// TESTCASE(4, "1 23         3    5", "1 23 3 5");
-	// TESTCASE(5, "1 23 3            5", "1 23 3 5");
-	// TESTCASE(6, "1 23 3 5           ", "1 23 3 5")
-	// TESTCASE(7, "1 23 3 5", "1 23 3 5");
-	// TESTCASE(8, " 1 23 3 5", "1 23 3 5");
-	// TESTCASE(9, "1  23 3 5", "1 23 3 5");
-	// TESTCASE(10, "1  23 3 5 ", "1 23 3 5");
+	TESTCASE("1 25     ", "1 25");
+	TESTCASE("   1    23   3    5     ", "1 23 3 5");
+	TESTCASE("   1    23   3    5     ", "1 23 3 5");
+	TESTCASE("      1 23   3    5", "1 23 3 5");
+	TESTCASE("1       23   3    5", "1 23 3 5");
+	TESTCASE("1 23         3    5", "1 23 3 5");
+	TESTCASE("1 23 3            5", "1 23 3 5");
+	TESTCASE("1 23 3 5           ", "1 23 3 5");
+	TESTCASE("1 23 3 5", "1 23 3 5");
+	TESTCASE(" 1 23 3 5", "1 23 3 5");
+	TESTCASE("1  23 3 5", "1 23 3 5");
+	TESTCASE("1  23 3 5 ", "1 23 3 5");
+	TESTCASE("1 2 2  ", "1 2 2");
+	TESTCASE("", "");
+	TESTCASE("               ", "");
+	TESTCASE("                           MID              ", "MID");
+	puts("The program successfully passed all testcases!");
 }
 
 int main()
@@ -42,7 +49,7 @@ int main()
 	char buf[256];
 	fgets(buf, 256, stdin);
 	buf[strlen(buf) - 1] = '\0';
-	int id = solve(buf);
-	printf("%s %d\n", buf, id);
+	solve(buf);
+	printf("%s|\n", buf);
 	return 0;
 }
