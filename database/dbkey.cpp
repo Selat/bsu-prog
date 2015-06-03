@@ -25,6 +25,11 @@ bool DBKey::operator==(const DBKey &k) const
 	return true;
 }
 
+bool DBKey::operator!=(const DBKey &k) const
+{
+	return !(*this == k);
+}
+
 bool DBKey::operator<(const DBKey &k) const
 {
 	if(fields_.size() < k.fields_.size()) {

@@ -64,3 +64,14 @@ std::vector<DBField>& DBRecord::getFields()
 {
 	return fields_;
 }
+
+std::ostream& operator<<(std::ostream &out, const DBRecord &r)
+{
+	for(size_t i = 0; i + 1 < r.size(); ++i) {
+		out << r[i] << " ";
+	}
+	if(r.size() > 0) {
+		out << r[r.size() - 1] << std::endl;
+	}
+	return out;
+}

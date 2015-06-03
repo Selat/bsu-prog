@@ -3,19 +3,19 @@
 
 #include <vector>
 
-#include "dbfile.h"
+#include "dbfilein.h"
 #include "dbrecord.h"
 
 class DBIterator
 {
 public:
-	DBIterator(const std::initializer_list<DBFile*> &files);
-	DBIterator(const std::vector<DBFile*> &files);
+	DBIterator(const std::initializer_list<DBFileIn*> &files);
+	DBIterator(const std::vector<DBFileIn*> &files);
 	void init();
 	bool nextEntry();
 	const DBRecord& getCurrentEntry() const;
 private:
-	std::vector <DBFile*> files_;
+	std::vector <DBFileIn*> files_;
 	std::vector <bool> have_entry_;
 	std::vector <DBRecord> entry_;
 	std::vector <bool> used_;

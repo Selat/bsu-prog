@@ -2,12 +2,12 @@
 
 #include "dbexceptions.h"
 
-DBIterator::DBIterator(const std::initializer_list<DBFile*> &files) :
+DBIterator::DBIterator(const std::initializer_list<DBFileIn*> &files) :
 	files_(files)
 {
 }
 
-DBIterator::DBIterator(const std::vector<DBFile*> &files) :
+DBIterator::DBIterator(const std::vector<DBFileIn*> &files) :
 	files_(files)
 {
 }

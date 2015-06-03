@@ -1,8 +1,8 @@
-#include "dbfile.h"
+#include "dbfileout.h"
 
 #include <sstream>
 
-DBFile::DBFile(DBFile&& file) :
+DBFileOut::DBFileOut(DBFileOut&& file) :
 	filename_(file.filename_),
 	field_names_(file.field_names_),
 	entry_(file.entry_),
@@ -10,7 +10,7 @@ DBFile::DBFile(DBFile&& file) :
 {
 }
 
-DBFile::DBFile(const std::string &filename, int fields_num) :
+DBFileOut::DBFileOut(const std::string &filename, int fields_num) :
 	filename_(filename), field_names_(fields_num), entry_(fields_num)
 {
 	for(int i = 0; i < fields_num; ++i) {
@@ -20,64 +20,67 @@ DBFile::DBFile(const std::string &filename, int fields_num) :
 	}
 }
 
-bool DBFile::open()
+bool DBFileOut::open()
 {
 	file_.open(filename_.c_str());
 	if(!file_.good()) {
 		return false;
 	} else {
 		for(size_t i = 0; i < field_names_.size(); ++i) {
-			file_ >> field_names_[i];
+			file_ << field_names_[i] << " ";
 		}
+		file_ << std::endl;
 		return true;
 	}
 }
 
-bool DBFile::eof() const
-{
-	return file_.eof();
-}
-
-void DBFile::close()
+void DBFileOut::close()
 {
 	file_.close();
 }
 
-bool DBFile::readNextEntry()
+bool DBFileOut::writeEntry()
 {
 	if(!file_.good()) {
 		return false;
 	} else {
 		for(size_t i = 0; i < entry_.size(); ++i) {
-			if(!(file_ >> entry_[i])) return false;
+			if(!(file_ << entry_[i] << " ")) return false;
 		}
-		entry_.setKeyFields(key_fields_);
+		file_ << std::endl;
 		return true;
 	}
 }
 
-const DBRecord& DBFile::getCurrentEntry() const
+DBRecord& DBFileOut::getCurrentEntry()
 {
 	return entry_;
 }
 
-DBKey DBFile::getCurrentKey() const
+DBKey DBFileOut::getCurrentKey() const
 {
 	return DBKey(entry_.getFields(), key_fields_);
 }
 
-void DBFile::setFieldNames(const std::initializer_list<std::string> &names)
+void DBFileOut::setCurrentKey(const DBKey &k)
+{
+	for(size_t i = 0; i < key_fields_.size(); ++i) {
+		entry_[key_fields_[i]] = k.getFields()[i];
+	}
+}
+
+void DBFileOut::setFieldNames(const std::initializer_list<std::string> &names)
 {
 	field_names_.assign(names.begin(), names.end());
 }
 
-void DBFile::setKeyFields(const std::initializer_list<int> &l)
+void DBFileOut::setKeyFields(const std::initializer_list<int> &l)
 {
 	key_fields_.assign(l.begin(), l.end());
 	entry_.setKeyFields(key_fields_);
 }
 
-const std::vector <std::string>& DBFile::getFieldNames() const
+const std::vector <std::string>& DBFileOut::getFieldNames() const
 {
 	return field_names_;
 }

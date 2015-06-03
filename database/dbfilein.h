@@ -1,5 +1,5 @@
-#ifndef DBFILE_H
-#define DBFILE_H
+#ifndef DBFILEIN_H
+#define DBFILEIN_H
 
 #include <vector>
 #include <fstream>
@@ -9,11 +9,11 @@
 #include "dbkey.h"
 #include "dbrecord.h"
 
-class DBFile
+class DBFileIn
 {
 public:
-	DBFile(DBFile&& file);
-	DBFile(const std::string &filename, int fields_num);
+	DBFileIn(DBFileIn&& file);
+	DBFileIn(const std::string &filename, int fields_num);
 	bool open();
 	void close();
 	bool eof() const;

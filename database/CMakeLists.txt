@@ -18,7 +18,8 @@ set(CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -gdwarf2")
 set(SOURCES
   main.cpp
   dbkey.cpp
-  dbfile.cpp
+  dbfilein.cpp
+  dbfileout.cpp
   dbfield.cpp
   dbrecord.cpp
   dbiterator.cpp

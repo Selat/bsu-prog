@@ -30,4 +30,6 @@ private:
 	DBKey key_;
 };
 
+std::ostream& operator<<(std::ostream &out, const DBRecord &r);
+
 #endif
