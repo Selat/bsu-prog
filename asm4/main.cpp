@@ -21,8 +21,15 @@ void print(int *a, int n, int m)
 
 int main()
 {
-	int c[9] = {1, 4, 98,
-	            3, 1000, 9};
+	int c[100] = {1, 4, 98,
+	              3, 1000, 9};
+	int n, m;
+	cin >> n >> m;
+	for(int i = 0; i < n; ++i) {
+		for(int j = 0; j < m; ++j) {
+			cin >> c[i * m + j];
+		}
+	}
 	transpose(c, 2, 3);
 	print(c, 3, 2);
 	return 0;
